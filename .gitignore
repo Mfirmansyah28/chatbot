@@ -1,0 +1,15 @@
+# Sembunyikan API Key dan konfigurasi lokal Streamlit
+.streamlit/secrets.toml
+
+# Sembunyikan folder virtual environment (jika Anda membuatnya)
+venv/
+.venv/
+env/
+
+# Sembunyikan cache Python
+__pycache__/
+*.pyc
+
+# Sembunyikan file log atau sistem operasi
+*.log
+.DS_Store

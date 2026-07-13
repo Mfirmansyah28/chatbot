@@ -61,4 +61,4 @@ styleup-chatbot-cs/
 ```
 
 ## 📜 Lisensi
-Proyek ini dibuat untuk keperluan pembelajaran dan pengembangan chatbot AI menggunakan Google Gemini API.
+Proyek ini dibuat untuk keperluan pembelajaran dan pengembangan chatbot AI menggunakan Open Router API.

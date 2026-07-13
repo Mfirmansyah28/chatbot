@@ -1,12 +1,11 @@
 import streamlit as st
-from google import genai
-from google.genai import types
+from openai import OpenAI
 
-# 1. Mengambil API Key secara aman dari secrets.toml
+# 1. Mengambil API Key OpenRouter secara aman dari secrets.toml
 try:
-    API_KEY = st.secrets["GEMINI_API_KEY"]
+    API_KEY = st.secrets["OPENROUTER_API_KEY"]
 except KeyError:
-    st.error("Error: API Key tidak ditemukan. Pastikan file .streamlit/secrets.toml sudah dibuat dengan benar.")
+    st.error("Error: API Key 'OPENROUTER_API_KEY' tidak ditemukan di .streamlit/secrets.toml")
     st.stop()
 
 # 2. Masukkan System Instructions & Katalog Toko
@@ -31,42 +30,54 @@ st.set_page_config(page_title="StyleUp Chatbot CS", page_icon="🛍️")
 st.title("🛍️ StyleUp - AI Customer Service")
 st.write("Halo! Selamat datang di StyleUp. Ada yang bisa Siti bantu hari ini?")
 
-# 4. Inisialisasi Client
+# 4. Inisialisasi Client OpenRouter (Menggunakan SDK OpenAI)
 if "client" not in st.session_state:
-    st.session_state.client = genai.Client(api_key=API_KEY)
+    st.session_state.client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=API_KEY
+    )
 
-# 5. Inisialisasi Chat Session dengan Model Terbaru & Stabil
-if "chat_session_v2" not in st.session_state:
-    try:
-        st.session_state.chat_session_v2 = st.session_state.client.chats.create(
-            model="gemini-2.0-flash", 
-            config=types.GenerateContentConfig(
-                system_instruction=system_instruction
-            )
-        )
-    except Exception as e:
-        st.error(f"Gagal menghubungkan ke AI Gemini: {e}")
+# 5. Inisialisasi Riwayat Obrolan Mandiri
+if "messages" not in st.session_state:
+    # Memasukkan system instruction di awal sebagai memori dasar AI
+    st.session_state.messages = [
+        {"role": "system", "content": system_instruction}
+    ]
 
-# 6. Tampilkan Riwayat Obrolan
-if "chat_session_v2" in st.session_state:
-    for message in st.session_state.chat_session_v2.get_history():
-        role = "user" if message.role == "user" else "assistant"
-        with st.chat_message(role):
-            st.write(message.parts[0].text)
+# 6. Tampilkan Riwayat Obrolan di Layar (Kecuali instruksi sistem)
+for message in st.session_state.messages:
+    if message["role"] != "system":
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
 
 # 7. Kotak Input Chat
 if user_input := st.chat_input("Tanya Siti sesuatu..."):
     if user_input.strip():
+        # Tampilkan chat kiriman user di layar
         with st.chat_message("user"):
             st.write(user_input)
         
-        if "chat_session_v2" in st.session_state:
-            try:
-                response = st.session_state.chat_session_v2.send_message(user_input)
-                with st.chat_message("assistant"):
-                    st.write(response.text)
-            except Exception as e:
-                st.error(f"Gagal memproses pesan: {e}")
-                st.info("Silakan tunggu beberapa saat atau refresh halaman jika kuota Free Tier Anda terkena pembatasan rate limit harian.")
-        else:
-            st.error("Sesi obrolan gagal dimulai. Silakan restart aplikasi kamu.")
+        # Simpan pesan user ke dalam riwayat session_state
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        
+        # Kirim seluruh riwayat ke OpenRouter
+        try:
+            with st.spinner("Siti sedang berpikir..."):
+                response = st.session_state.client.chat.completions.create(
+                    model="nvidia/nemotron-3-nano-30b-a3b:free",  # <-- Menggunakan model GRATIS OpenRouter
+                    messages=st.session_state.messages
+                )
+                
+                # Mengambil teks jawaban dari respon OpenRouter
+                assistant_response = response.choices[0].message.content
+            
+            # Tampilkan jawaban Siti di layar
+            with st.chat_message("assistant"):
+                st.write(assistant_response)
+                
+            # Simpan jawaban Siti ke dalam riwayat agar percakapan tetap nyambung
+            st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+            
+        except Exception as e:
+            st.error(f"Gagal memproses pesan via OpenRouter: {e}")
+            st.info("Pastikan kuota akun OpenRouter Anda mencukupi atau model sedang tidak sibuk.")

@@ -1,6 +1,6 @@
 # 🛍️ StyleUp - AI Customer Service Chatbot
 
-StyleUp Chatbot AI adalah aplikasi Customer Service (CS) digital berbasis web yang dibangun menggunakan **Streamlit** sebagai antarmuka pengguna dan **Google Gemini API** (`gemini-2.0-flash`) sebagai otak kecerdasan buatannya. Chatbot ini diprogram secara khusus dengan kepribadian bernama **"Siti"** yang ramah, informatif, dan patuh pada katalog produk toko fashion StyleUp.
+StyleUp Chatbot AI adalah aplikasi Customer Service (CS) digital berbasis web yang dibangun menggunakan **Streamlit** sebagai antarmuka pengguna dan **OpenRouter** (`nvidia/nemotron-3-nano-30b-a3b:free`) sebagai otak kecerdasan buatannya. Chatbot ini diprogram secara khusus dengan kepribadian bernama **"Siti"** yang ramah, informatif, dan patuh pada katalog produk toko fashion StyleUp.
 
 ## ✨ Fitur Utama
 - **Kepribadian CS Khas ("Siti")**: Merespons dengan Bahasa Indonesia yang santun, kasual, dan ramah (menggunakan sapaan *Kak/Kakak* serta emoji yang relevan).
@@ -12,7 +12,7 @@ StyleUp Chatbot AI adalah aplikasi Customer Service (CS) digital berbasis web ya
 ## 🛠️ Prasyarat (Prerequisites)
 Sebelum menjalankan proyek ini, pastikan Anda telah menginstal:
 - Python 3.10 atau versi di atasnya
-- API Key aktif dari [Google AI Studio](https://google.com)
+- API Key aktif dari [Open Router](https://openrouter.ai/)
 
 ## 🚀 Cara Menjalankan di Komputer Lokal
 
@@ -35,7 +35,7 @@ Buat struktur folder dan file konfigurasi rahasia untuk menyimpan API Key Anda s
 2. Di dalam folder tersebut, buat file bernama `secrets.toml`.
 3. Isi file `secrets.toml` dengan format berikut:
    ```toml
-   GEMINI_API_KEY = "MASUKKAN_API_KEY_GEMINI_ANDA"
+   OPENROUTER_API_KEY = "MASUKKAN_API_OPEN ROUTER_ANDA"
    ```
 
 > ⚠️ **PENTING**: File `.streamlit/secrets.toml` sudah dimasukkan ke dalam `.gitignore` sehingga aman dan tidak akan pernah ikut terunggah ke repositori GitHub publik Anda.

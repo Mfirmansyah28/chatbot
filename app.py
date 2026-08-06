@@ -81,23 +81,39 @@ if user_input := st.chat_input("Tanya Siti sesuatu..."):
         st.session_state.messages.append({"role": "user", "content": user_input})
         
         # Kirim seluruh riwayat ke OpenRouter
-        try:
-            with st.spinner("Siti sedang berpikir..."):
-                response = st.session_state.client.chat.completions.create(
-                    model="nvidia/nemotron-3-nano-30b-a3b:free",  # <-- Menggunakan model GRATIS OpenRouter
-                    messages=st.session_state.messages
-                )
-                
-                # Mengambil teks jawaban dari respon OpenRouter
-                assistant_response = response.choices[0].message.content
-            
-            # Tampilkan jawaban Siti di layar
-            with st.chat_message("assistant"):
-                st.write(assistant_response)
-                
-            # Simpan jawaban Siti ke dalam riwayat agar percakapan tetap nyambung
-            st.session_state.messages.append({"role": "assistant", "content": assistant_response})
-            
-        except Exception as e:
-            st.error(f"Gagal memproses pesan via OpenRouter: {e}")
-            st.info("Pastikan kuota akun OpenRouter Anda mencukupi atau model sedang tidak sibuk.")
+try:
+
+    with st.chat_message("assistant"):
+
+        placeholder = st.empty()
+        full_response = ""
+
+        stream = st.session_state.client.chat.completions.create(
+            model="nvidia/nemotron-3-nano-30b-a3b:free",
+            messages=st.session_state.messages,
+            stream=True,
+        )
+
+        for chunk in stream:
+
+            if (
+                chunk.choices
+                and chunk.choices[0].delta
+                and chunk.choices[0].delta.content
+            ):
+                token = chunk.choices[0].delta.content
+                full_response += token
+                placeholder.markdown(full_response + "▌")
+
+        placeholder.markdown(full_response)
+
+    st.session_state.messages.append(
+        {
+            "role": "assistant",
+            "content": full_response,
+        }
+    )
+
+except Exception as e:
+    st.error(f"Gagal memproses pesan via OpenRouter: {e}")
+    st.info("Pastikan kuota akun OpenRouter Anda mencukupi atau model sedang tidak sibuk.")

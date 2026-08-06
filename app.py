@@ -1,5 +1,6 @@
 import streamlit as st
 from openai import OpenAI
+import streamlit.components.v1 as components
 
 # 1. Mengambil API Key OpenRouter secara aman dari secrets.toml
 try:
@@ -106,6 +107,18 @@ try:
                 placeholder.markdown(full_response + "▌")
 
         placeholder.markdown(full_response)
+
+        if st.button("📋 Copy Response", key=f"copy_{len(st.session_state.messages)}"):
+
+            components.html(
+                f"""
+                <script>
+                navigator.clipboard.writeText(`{full_response}`);
+                </script>
+                """,
+                height=0
+            )
+            st.toast("Jawaban Berhasil DIsalin")
 
     st.session_state.messages.append(
         {

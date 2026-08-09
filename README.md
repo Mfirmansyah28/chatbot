@@ -62,3 +62,6 @@ styleup-chatbot-cs/
 
 ## 📜 Lisensi
 Proyek ini dibuat untuk keperluan pembelajaran dan pengembangan chatbot AI menggunakan Open Router API.
+
+## Demo 
+Link Demo:[https://chatbot-xdpwmm2snbqlywrjzrpq2m.streamlit.app/]

@@ -16,6 +16,54 @@ PRODUCT_CATALOG = """
    Ukuran: 28, 30, 32, 34
    Harga: Rp 200.000
 """
+
+PRODUCTS = [
+    {
+        "name": "Kemeja Flanel Kotak-Kotak",
+        "colors": [
+            "Merah-Hitam",
+            "Biru-Navy",
+        ],
+        "sizes": [
+            "M",
+            "L",
+            "XL",
+        ],
+        "price": 150000,
+    },
+    {
+        "name": "Kaos Polos Katun Premium",
+        "colors": [
+            "Hitam",
+            "Putih",
+            "Sage Green",
+            "Lilac",
+        ],
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+        ],
+        "price": 75000,
+    },
+    {
+        "name": "Celana Chino Slimfit",
+        "colors": [
+            "Krem",
+            "Hitam",
+            "Abu-abu",
+        ],
+        "sizes": [
+            "28",
+            "30",
+            "32",
+            "34",
+        ],
+        "price": 200000,
+    },
+]
+
 FAQ = """
 === FAQ CUSTOMER SERVICE STYLEUP ===
 

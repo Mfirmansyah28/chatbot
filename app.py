@@ -10,6 +10,10 @@ from services.guardrail import (
     get_guardrail_message,
     build_guardrail_context,
 )
+from services.product_search import (
+    search_products,
+    format_product_results,
+)
 
 from services.chat_manager import (
     load_chats,
@@ -177,8 +181,24 @@ if user_input := st.chat_input(
     # DETECT INTENT
     # ======================================
     intent = detect_intent(user_input)
-
     print(f"[INTENT] {intent}")
+    # ======================================
+    # PRODUCT SEARCH
+    # ======================================
+
+    product_context = ""
+
+    if intent == "product_search":
+        results = search_products(user_input)
+        product_context = format_product_results(
+            results
+        )
+
+        print(product_context)
+    intent_instruction = get_intent_instruction(
+        intent
+    )
+    
 
     # ======================================
     # GUARDRAIL
@@ -254,6 +274,8 @@ if user_input := st.chat_input(
                         + intent_instruction
                         + "\n\n"
                         + guardrail_context
+                        + "\n\n"
+                        + product_context
                     ),
                 }
             )

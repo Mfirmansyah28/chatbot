@@ -3,9 +3,18 @@ import streamlit.components.v1 as components
 
 from services.openrouter import generate_response
 from services.catalog import SYSTEM_PROMPT
+from services.intent import detect_intent
+from services.intent_context import get_intent_instruction
+from services.guardrail import (
+    is_styleup_topic,
+    get_guardrail_message,
+    build_guardrail_context,
+)
 
 from services.chat_manager import (
     load_chats,
+    create_chat,
+    add_chat,
     update_chat,
 )
 
@@ -164,6 +173,50 @@ if user_input := st.chat_input(
         }
     )
 
+    # ======================================
+    # DETECT INTENT
+    # ======================================
+    intent = detect_intent(user_input)
+
+    print(f"[INTENT] {intent}")
+
+    # ======================================
+    # GUARDRAIL
+    # ======================================
+    if not is_styleup_topic(user_input):
+        with st.chat_message("assistant"):
+            response = get_guardrail_message()
+            st.markdown(response)
+
+        messages.append(
+            {
+                "role": "assistant",
+                "content": response,
+            }
+        )
+
+        update_chat(
+            st.session_state.chats,
+            st.session_state.current_chat_id,
+            messages,
+        )
+
+        st.stop()
+
+    intent_instruction = get_intent_instruction(
+    intent
+    )
+
+    guardrail_context = build_guardrail_context(
+        intent
+    )
+
+    print(
+    f"[INTENT INSTRUCTION] "
+    f"{intent_instruction}"
+    )
+    
+
 
     # ======================================
     # AUTO TITLE
@@ -188,8 +241,25 @@ if user_input := st.chat_input(
 
             full_response = ""
 
+              # ==================================
+            # BUAT CONTEXT KHUSUS UNTUK AI
+            # ==================================
+
+            ai_messages = messages.copy()
+            ai_messages.append(
+                {
+                    "role":"system",
+                    "content": (
+                        "INSTRUKSI INTENT INTERNAL:\n"
+                        + intent_instruction
+                        + "\n\n"
+                        + guardrail_context
+                    ),
+                }
+            )
+
             stream = generate_response(
-                messages
+                ai_messages
             )
 
             # ==============================

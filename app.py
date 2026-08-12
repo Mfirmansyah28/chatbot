@@ -2,14 +2,15 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from services.openrouter import generate_response
-from services.catalog import SYSTEM_PROMPT
 from services.intent import detect_intent
 from services.intent_context import get_intent_instruction
+
 from services.guardrail import (
     is_styleup_topic,
     get_guardrail_message,
     build_guardrail_context,
 )
+
 from services.product_search import (
     search_products,
     format_product_results,
@@ -17,8 +18,6 @@ from services.product_search import (
 
 from services.chat_manager import (
     load_chats,
-    create_chat,
-    add_chat,
     update_chat,
 )
 
@@ -103,7 +102,6 @@ if (
 else:
 
     current_chat = None
-
     messages = []
 
 
@@ -147,8 +145,13 @@ if user_input := st.chat_input(
     "Tanya Siti sesuatu..."
 ):
 
+    # ======================================
+    # VALIDASI INPUT
+    # ======================================
+
     if not user_input.strip():
         st.stop()
+
 
     # ======================================
     # PASTIKAN CHAT AKTIF
@@ -162,13 +165,15 @@ if user_input := st.chat_input(
 
         st.stop()
 
+
     # ======================================
-    # USER MESSAGE
+    # TAMPILKAN USER MESSAGE
     # ======================================
 
     with st.chat_message("user"):
 
         st.markdown(user_input)
+
 
     messages.append(
         {
@@ -176,66 +181,6 @@ if user_input := st.chat_input(
             "content": user_input,
         }
     )
-
-    # ======================================
-    # DETECT INTENT
-    # ======================================
-    intent = detect_intent(user_input)
-    print(f"[INTENT] {intent}")
-    # ======================================
-    # PRODUCT SEARCH
-    # ======================================
-
-    product_context = ""
-
-    if intent == "product_search":
-        results = search_products(user_input)
-        product_context = format_product_results(
-            results
-        )
-
-        print(product_context)
-    intent_instruction = get_intent_instruction(
-        intent
-    )
-    
-
-    # ======================================
-    # GUARDRAIL
-    # ======================================
-    if not is_styleup_topic(user_input):
-        with st.chat_message("assistant"):
-            response = get_guardrail_message()
-            st.markdown(response)
-
-        messages.append(
-            {
-                "role": "assistant",
-                "content": response,
-            }
-        )
-
-        update_chat(
-            st.session_state.chats,
-            st.session_state.current_chat_id,
-            messages,
-        )
-
-        st.stop()
-
-    intent_instruction = get_intent_instruction(
-    intent
-    )
-
-    guardrail_context = build_guardrail_context(
-        intent
-    )
-
-    print(
-    f"[INTENT INSTRUCTION] "
-    f"{intent_instruction}"
-    )
-    
 
 
     # ======================================
@@ -250,43 +195,211 @@ if user_input := st.chat_input(
 
 
     # ======================================
+    # DETECT INTENT
+    # ======================================
+
+    intent = detect_intent(
+        user_input
+    )
+
+    print(
+        f"[INTENT] {intent}"
+    )
+
+
+    # ======================================
+    # GUARDRAIL
+    # ======================================
+
+    if not is_styleup_topic(
+        user_input
+    ):
+
+        with st.chat_message(
+            "assistant"
+        ):
+
+            response = (
+                get_guardrail_message()
+            )
+
+            st.markdown(
+                response
+            )
+
+
+        messages.append(
+            {
+                "role": "assistant",
+                "content": response,
+            }
+        )
+
+
+        update_chat(
+            st.session_state.chats,
+            st.session_state.current_chat_id,
+            messages,
+        )
+
+        st.stop()
+
+
+    # ======================================
+    # INTENT INSTRUCTION
+    # ======================================
+
+    intent_instruction = (
+        get_intent_instruction(
+            intent
+        )
+    )
+
+    print(
+        f"[INTENT INSTRUCTION] "
+        f"{intent_instruction}"
+    )
+
+
+    # ======================================
+    # GUARDRAIL CONTEXT
+    # ======================================
+
+    guardrail_context = (
+        build_guardrail_context(
+            intent
+        )
+    )
+
+
+    # ======================================
+    # PRODUCT SEARCH
+    # ======================================
+
+    product_context = ""
+
+
+    if intent == "product_search":
+
+        results = search_products(
+            user_input
+        )
+
+
+        print(
+            "[PRODUCT SEARCH]",
+            [
+                (
+                    r["product"]["name"],
+                    r["product"]["price"]
+                )
+                for r in results
+            ]
+        )
+
+
+        product_context = (
+            format_product_results(
+                results
+            )
+        )
+
+
+        print(
+            "[PRODUCT CONTEXT]"
+        )
+
+        print(
+            product_context
+        )
+
+
+    # ======================================
+    # BUAT CONTEXT INTERNAL UNTUK AI
+    # ======================================
+
+    internal_context = f"""
+INSTRUKSI INTENT INTERNAL:
+
+{intent_instruction}
+
+
+GUARDRAIL CONTEXT:
+
+{guardrail_context}
+"""
+
+
+    # ======================================
+    # TAMBAHKAN PRODUCT CONTEXT
+    # ======================================
+
+    if product_context:
+
+        internal_context += f"""
+
+HASIL PENCARIAN PRODUK STYLEUP:
+
+{product_context}
+
+
+ATURAN PRODUCT SEARCH:
+
+- Gunakan hasil pencarian di atas sebagai sumber
+  informasi produk.
+- Jangan mengarang produk.
+- Jangan mengarang harga.
+- Jangan mengarang warna.
+- Jangan mengarang ukuran.
+- Jangan memberikan produk yang tidak terdapat
+  dalam hasil pencarian.
+- Jika hasil pencarian mengatakan produk tidak
+  ditemukan, sampaikan bahwa produk yang sesuai
+  belum tersedia.
+- Jawab secara singkat dan natural sebagai Siti.
+"""
+
+
+    # ======================================
+    # BUAT MESSAGE UNTUK AI
+    # ======================================
+
+    messages_for_ai = list(
+        messages
+    )
+
+
+    messages_for_ai.append(
+        {
+            "role": "system",
+            "content": internal_context,
+        }
+    )
+
+
+    # ======================================
     # GENERATE AI RESPONSE
     # ======================================
 
     try:
 
-        with st.chat_message("assistant"):
+        with st.chat_message(
+            "assistant"
+        ):
 
             placeholder = st.empty()
 
             full_response = ""
 
-              # ==================================
-            # BUAT CONTEXT KHUSUS UNTUK AI
+
+            # ==================================
+            # OPENROUTER STREAMING
             # ==================================
 
-            ai_messages = messages.copy()
-            ai_messages.append(
-                {
-                    "role":"system",
-                    "content": (
-                        "INSTRUKSI INTENT INTERNAL:\n"
-                        + intent_instruction
-                        + "\n\n"
-                        + guardrail_context
-                        + "\n\n"
-                        + product_context
-                    ),
-                }
-            )
-
             stream = generate_response(
-                ai_messages
+                messages_for_ai
             )
 
-            # ==============================
-            # STREAMING
-            # ==============================
 
             for chunk in stream:
 
@@ -302,20 +415,28 @@ if user_input := st.chat_input(
                         .content
                     )
 
+
                     full_response += token
 
+
                     placeholder.markdown(
-                        full_response + "▌"
+                        full_response
+                        + "▌"
                     )
+
+
+            # ==================================
+            # FINAL RESPONSE
+            # ==================================
 
             placeholder.markdown(
                 full_response
             )
 
 
-            # ==============================
+            # ==================================
             # COPY BUTTON
-            # ==============================
+            # ==================================
 
             if st.button(
                 "📋 Copy Response",
@@ -333,13 +454,14 @@ if user_input := st.chat_input(
                     height=0,
                 )
 
+
                 st.toast(
                     "Jawaban berhasil disalin 😊"
                 )
 
 
         # ==================================
-        # ASSISTANT MESSAGE
+        # SIMPAN ASSISTANT MESSAGE
         # ==================================
 
         messages.append(
@@ -351,7 +473,7 @@ if user_input := st.chat_input(
 
 
         # ==================================
-        # SAVE CHAT
+        # SIMPAN CHAT
         # ==================================
 
         update_chat(
@@ -361,10 +483,15 @@ if user_input := st.chat_input(
         )
 
 
+    # ======================================
+    # ERROR HANDLING
+    # ======================================
+
     except Exception as e:
 
         st.error(
-            f"Gagal memproses pesan via OpenRouter: {e}"
+            "Gagal memproses pesan via "
+            f"OpenRouter: {e}"
         )
 
         st.info(

@@ -1,9 +1,9 @@
 {
-  "8b12216f-0a11-4f71-94e2-efcbbf2934ff": {
-    "id": "8b12216f-0a11-4f71-94e2-efcbbf2934ff",
-    "title": "Saya cari baju hitam di bawah 100 ribu",
-    "created_at": "2026-08-10T18:03:02.659786",
-    "updated_at": "2026-08-10T18:04:26.212698",
+  "ecf4f7fc-f99c-423a-8a4e-c27ffc380e65": {
+    "id": "ecf4f7fc-f99c-423a-8a4e-c27ffc380e65",
+    "title": "Halo Siti",
+    "created_at": "2026-08-12T16:37:45.893943",
+    "updated_at": "2026-08-12T16:38:10.178218",
     "messages": [
       {
         "role": "system",
@@ -11,35 +11,19 @@
       },
       {
         "role": "user",
-        "content": "Saya cari baju hitam di bawah 100 ribu"
+        "content": "Halo Siti"
       },
       {
         "role": "assistant",
-        "content": "Halo Kak! 😊  \nKami punya **Kaos Polos Katun Premium** dalam warna **Hitam** dengan harga **Rp75.000** (jadi masih di bawah 100 ribuan).  \nUkuran yang tersedia: S, M, L, XL.  \n\nMau dialihkan ke halaman pemesanan atau butuh bantuan lain? 🛍️  \nSilakan beri tahu saya ukuran yang Anda suka, atau pertanyaannya apa?"
+        "content": "Halo! 👋 Ada yang bisa saya bantu hari ini? 😊"
       },
       {
         "role": "user",
-        "content": "Ada pakaian hitam?"
+        "content": "Siapa presiden indonesia?"
       },
       {
         "role": "assistant",
-        "content": "Halo Kak! 😊  \nKami memang punya **Kaos Polos Katun Premium** dalam warna **Hitam**, harganya **Rp 75.000** (masih di bawah 100 ribuan).  \nUkuran yang tersedia: **S, M, L, XL**.  \n\nKalau ada size atau model lain yang Anda suka, beri tahu saya ya! 🙏✨"
-      },
-      {
-        "role": "user",
-        "content": "Saya punya budget 200 ribu, cari pakaian"
-      },
-      {
-        "role": "assistant",
-        "content": "Halo Kak! 👋  \n\nBerikut produk di katalog **StyleUp** yang harga nya ≤ Rp 200.000 (sesuai budget Anda):\n\n| Produk | Warna tersedia | Ukuran | Harga |\n|--------|----------------|--------|-------|\n| **Kaos Polos Katun Premium** | Hitam, Putih, Sage Green, Lilac | S, M, L, XL | Rp 75.000 |\n| **Kemeja Flanel Kotak‑Kotak** | Merah‑Hitam, Biru‑Navy | M, L, XL | Rp 150.000 |\n| **Celana Chino Slimfit** | Krem, Hitam, Abu‑abu | 28, 30, 32, 34 | Rp 200.000 |\n\nJika Anda memiliki prefensi warna atau ukuran tertentu, beri tahu saya ya, Kak! Saya siap membantu mencari yang paling cocok. 🙏✨  \n\n*(Jika Anda mencari produk dengan kriteria lain—misalnya type produk atau fitur khusus—saya masih bisa membantu pada range yang sama.)*"
-      },
-      {
-        "role": "user",
-        "content": "Cari baju merah di bawah 100 ribu"
-      },
-      {
-        "role": "assistant",
-        "content": "Halo Kak! 😊  \n\nAku cek katalog StyleUp, dan **tidak ada produk baju merah yang dijual dengan harga di bawah 100 ribuan**.  \nProduk yang tersedia dengan harga **Rp 75.000** (jadi masih di bawah 100 ribuan) adalah:\n\n- *Kaos Polos Katun Premium* – warna: **Hitam, Putih, Sage Green, Lilac** – ukuran: S, M, L, XL.\n\nJika Anda suka warna merah, sayangnya belum tersedia di katalog kami. Apa ada warna lain yang Anda ingin cari atau size tertentu yang ingin dipesan? Aku bantu apa saja? 🙏✨"
+        "content": "Maaf ya, Kak 😊 Siti hanya dapat membantu mengenai produk, fashion, belanja, dan layanan Customer Service StyleUp. 🛍️✨"
       }
     ]
   }

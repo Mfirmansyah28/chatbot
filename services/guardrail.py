@@ -6,7 +6,11 @@ from services.catalog import PRODUCT_CATALOG, FAQ
 # ==========================================
 
 ALLOWED_KEYWORDS = [
+
+    # ======================================
     # Produk
+    # ======================================
+
     "baju",
     "kaos",
     "kemeja",
@@ -19,14 +23,22 @@ ALLOWED_KEYWORDS = [
     "ukuran",
     "warna",
 
+
+    # ======================================
     # Belanja
+    # ======================================
+
     "beli",
     "pesan",
     "order",
     "pemesanan",
     "belanja",
 
+
+    # ======================================
     # Customer Service
+    # ======================================
+
     "pembayaran",
     "bayar",
     "cod",
@@ -40,7 +52,11 @@ ALLOWED_KEYWORDS = [
     "cs",
     "customer service",
 
+
+    # ======================================
     # Fashion
+    # ======================================
+
     "fashion",
     "pakaian",
     "outfit",
@@ -49,19 +65,61 @@ ALLOWED_KEYWORDS = [
 ]
 
 
+# ==========================================
+# GREETING KEYWORDS
+# ==========================================
+
+GREETING_KEYWORDS = [
+
+    "halo",
+    "hai",
+    "hi",
+    "hello",
+    "selamat pagi",
+    "selamat siang",
+    "selamat sore",
+    "selamat malam",
+]
+
+
+# ==========================================
+# CHECK STYLEUP TOPIC
+# ==========================================
+
 def is_styleup_topic(user_input):
     """
     Mengecek apakah pertanyaan masih berkaitan
-    dengan StyleUp, fashion, produk, atau layanan CS.
+    dengan StyleUp, fashion, produk, layanan CS,
+    atau greeting.
     """
 
     text = user_input.lower().strip()
+
+
+    # ======================================
+    # GREETING
+    # ======================================
+
+    if any(
+        keyword in text
+        for keyword in GREETING_KEYWORDS
+    ):
+        return True
+
+
+    # ======================================
+    # STYLEUP TOPIC
+    # ======================================
 
     return any(
         keyword in text
         for keyword in ALLOWED_KEYWORDS
     )
 
+
+# ==========================================
+# GUARDRAIL MESSAGE
+# ==========================================
 
 def get_guardrail_message():
     """
@@ -76,6 +134,10 @@ def get_guardrail_message():
         "StyleUp. 🛍️✨"
     )
 
+
+# ==========================================
+# BUILD GUARDRAIL CONTEXT
+# ==========================================
 
 def build_guardrail_context(intent):
     """

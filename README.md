@@ -1,67 +1,145 @@
 # 🛍️ StyleUp - AI Customer Service Chatbot
 
-StyleUp Chatbot AI adalah aplikasi Customer Service (CS) digital berbasis web yang dibangun menggunakan **Streamlit** sebagai antarmuka pengguna dan **OpenRouter** (`nvidia/nemotron-3-nano-30b-a3b:free`) sebagai otak kecerdasan buatannya. Chatbot ini diprogram secara khusus dengan kepribadian bernama **"Siti"** yang ramah, informatif, dan patuh pada katalog produk toko fashion StyleUp.
+StyleUp Chatbot adalah aplikasi Customer Service digital berbasis web yang dibangun dengan **Streamlit** dan **OpenRouter** (`nvidia/nemotron-3-nano-30b-a3b:free`). Chatbot ini memiliki kepribadian bernama **"Siti"** — CS virtual StyleUp yang ramah, informatif, dan hanya menjawab seputar produk serta layanan toko fashion StyleUp.
 
 ## ✨ Fitur Utama
-- **Kepribadian CS Khas ("Siti")**: Merespons dengan Bahasa Indonesia yang santun, kasual, dan ramah (menggunakan sapaan *Kak/Kakak* serta emoji yang relevan).
-- **Katalog Produk Terintegrasi**: Siti hanya akan menjawab pertanyaan stok dan harga berdasarkan data asli toko StyleUp.
-- **Proteksi Topik**: Menolak pertanyaan di luar topik fashion, gaya busana, dan belanja dengan halus.
-- **Manajemen Riwayat Sesi**: Menyimpan riwayat obrolan selama sesi browser berlangsung menggunakan `st.session_state`.
-- **Keamanan API Key**: Menggunakan konfigurasi aman `st.secrets` untuk mencegah kebocoran API Key ke publik.
 
-## 🛠️ Prasyarat (Prerequisites)
-Sebelum menjalankan proyek ini, pastikan Anda telah menginstal:
-- Python 3.10 atau versi di atasnya
-- API Key aktif dari [Open Router](https://openrouter.ai/)
+- **Kepribadian CS "Siti"** — Merespons dalam Bahasa Indonesia yang santun dan kasual, menggunakan sapaan *Kak/Kakak* dan emoji yang relevan.
+- **Deteksi Intent Otomatis** — Mengenali intent pelanggan seperti pencarian produk, tanya harga, stok, pemesanan, pembayaran, pengiriman, retur, dan greeting.
+- **Pencarian Produk Cerdas** — Mencari produk berdasarkan nama, warna, budget, dan preferensi harga dari katalog StyleUp.
+- **Konteks Percakapan** — Memahami pertanyaan lanjutan seperti *"yang tadi berapa?"* atau *"ada warna lain?"* tanpa perlu mengulang informasi.
+- **Guardrail Topik** — Menolak pertanyaan di luar topik fashion, belanja, dan layanan StyleUp secara halus.
+- **Manajemen Multi-Chat** — Mendukung beberapa sesi chat dengan fitur buat, pilih, dan hapus riwayat chat.
+- **Riwayat Chat Persisten** — Menyimpan riwayat obrolan ke `data/chats.json` sehingga tidak hilang saat halaman di-refresh.
+- **Streaming Response** — Jawaban AI ditampilkan secara real-time token demi token.
+- **Salin Jawaban** — Tombol Copy Response untuk menyalin jawaban AI dengan mudah.
+- **Keamanan API Key** — Menggunakan `st.secrets` agar API Key tidak bocor ke publik.
 
-## 🚀 Cara Menjalankan di Komputer Lokal
+## 🗂️ Struktur Direktori
 
-### 1. Kloning Repositori
-```bash
-git clone https://github.com
-cd styleup-chatbot-cs
 ```
-*(Catatan: Ganti USERNAME_ANDA/REPOSITORI_ANDA dengan tautan repositori GitHub Anda sendiri).*
+chatbot/
+│
+├── .streamlit/
+│   └── secrets.toml          # API Key (LOKAL SAJA, tidak di-commit)
+│
+├── data/
+│   └── chats.json            # Penyimpanan riwayat chat
+│
+├── services/
+│   ├── catalog.py            # Katalog produk, FAQ, dan system prompt Siti
+│   ├── chat_manager.py       # CRUD manajemen sesi chat (JSON)
+│   ├── conversation_context.py  # Membangun konteks percakapan sebelumnya
+│   ├── guardrail.py          # Filter topik dan pesan penolakan
+│   ├── intent.py             # Deteksi intent pelanggan
+│   ├── intent_context.py     # Instruksi AI berdasarkan intent
+│   ├── openrouter.py         # Client OpenRouter (streaming)
+│   └── product_search.py     # Pencarian produk berdasarkan warna, budget, nama
+│
+├── ui/
+│   └── sidebar.py            # Sidebar: New Chat, daftar, dan hapus chat
+│
+├── app.py                    # Entry point aplikasi Streamlit
+├── requirements.txt          # Dependensi Python
+├── runtime.txt               # Versi Python untuk deployment
+├── .gitignore
+└── README.md
+```
 
-### 2. Instal Dependensi
-Pasang semua pustaka Python yang diperlukan yang terdaftar di `requirements.txt`:
+## 📦 Katalog Produk
+
+| Produk | Warna | Ukuran | Harga |
+|---|---|---|---|
+| Kemeja Flanel Kotak-Kotak | Merah-Hitam, Biru-Navy | M, L, XL | Rp 150.000 |
+| Kaos Polos Katun Premium | Hitam, Putih, Sage Green, Lilac | S, M, L, XL | Rp 75.000 |
+| Celana Chino Slimfit | Krem, Hitam, Abu-abu | 28, 30, 32, 34 | Rp 200.000 |
+
+## 🛠️ Prasyarat
+
+- Python 3.11
+- API Key dari [OpenRouter](https://openrouter.ai/)
+
+## 🚀 Menjalankan di Lokal
+
+### 1. Clone Repositori
+
+```bash
+git clone https://github.com/USERNAME/chatbot.git
+cd chatbot
+```
+
+### 2. Buat Virtual Environment (Opsional tapi Disarankan)
+
+```bash
+python -m venv venv
+venv\Scripts\activate      # Windows
+source venv/bin/activate   # Mac/Linux
+```
+
+### 3. Install Dependensi
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Konfigurasi API Key (Penting & Rahasia)
-Buat struktur folder dan file konfigurasi rahasia untuk menyimpan API Key Anda secara aman:
-1. Buat folder bernama `.streamlit/` di direktori utama proyek Anda.
-2. Di dalam folder tersebut, buat file bernama `secrets.toml`.
-3. Isi file `secrets.toml` dengan format berikut:
-   ```toml
-   OPENROUTER_API_KEY = "MASUKKAN_API_OPEN ROUTER_ANDA"
-   ```
+### 4. Konfigurasi API Key
 
-> ⚠️ **PENTING**: File `.streamlit/secrets.toml` sudah dimasukkan ke dalam `.gitignore` sehingga aman dan tidak akan pernah ikut terunggah ke repositori GitHub publik Anda.
+Buat file `.streamlit/secrets.toml` dan isi dengan:
 
-### 4. Jalankan Aplikasi
-Jalankan server lokal Streamlit Anda dengan perintah:
+```toml
+OPENROUTER_API_KEY = "sk-or-xxxxxxxxxxxxxxxx"
+```
+
+> ⚠️ File `secrets.toml` sudah masuk `.gitignore` dan tidak akan ikut ter-commit ke GitHub.
+
+### 5. Jalankan Aplikasi
+
 ```bash
 streamlit run app.py
 ```
-Aplikasi otomatis akan terbuka di browser Anda pada alamat default `http://localhost:8501`.
 
-## 📦 Struktur Direktori Proyek
-```text
-styleup-chatbot-cs/
-│
-├── .streamlit/
-│   └── secrets.toml      # Menyimpan API Key (DILINDUNGI / LOKAL SAJA)
-│
-├── app.py                # Kode utama aplikasi Chatbot Streamlit
-├── .gitignore            # Daftar file yang diabaikan oleh Git (Mengamankan secrets.toml)
-├── requirements.txt      # Daftar pustaka Python (Streamlit & Google GenAI)
-└── README.md             # Dokumentasi proyek (File ini)
+Aplikasi akan terbuka di browser pada `http://localhost:8501`.
+
+## ⚙️ Cara Kerja
+
+```
+Input Pengguna
+     │
+     ▼
+Guardrail (apakah topik relevan?)
+     │  Tidak → Pesan penolakan Siti
+     │  Ya ↓
+     ▼
+Deteksi Intent (greeting / product_search / payment / dst.)
+     │
+     ▼
+Bangun Konteks (riwayat percakapan + instruksi intent + guardrail)
+     │
+     ▼
+Product Search (jika intent = product_search)
+     │
+     ▼
+Kirim ke OpenRouter (streaming)
+     │
+     ▼
+Tampilkan Jawaban Siti + Simpan ke chats.json
 ```
 
-## 📜 Lisensi
-Proyek ini dibuat untuk keperluan pembelajaran dan pengembangan chatbot AI menggunakan Open Router API.
+## 🧰 Teknologi
 
-## Demo 
-Link Demo:[https://chatbot-xdpwmm2snbqlywrjzrpq2m.streamlit.app/]
+| Komponen | Detail |
+|---|---|
+| Framework UI | Streamlit 1.46.1 |
+| AI Provider | OpenRouter |
+| Model AI | `nvidia/nemotron-3-nano-30b-a3b:free` |
+| Client API | openai 1.99.9 (kompatibel OpenRouter) |
+| Penyimpanan Chat | JSON lokal (`data/chats.json`) |
+| Runtime | Python 3.11 |
+
+## 🌐 Demo
+
+[https://chatbot-xdpwmm2snbqlywrjzrpq2m.streamlit.app/]
+
+## 📜 Lisensi
+
+Proyek ini dibuat untuk keperluan pembelajaran dan pengembangan chatbot AI menggunakan OpenRouter API.
